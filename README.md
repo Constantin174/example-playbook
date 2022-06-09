@@ -5,7 +5,26 @@
 ### Подготовка к выполнению
 
 1) Установить jenkins по любой из инструкций.
-Выполнено. Для установки использовал образы докер docker:dind для работы динамических агентов и образ jenkins/jenkins:2.332.3-jdk11 с добавлением плагинов blueocean и docker-workflow.
+Выполнено. Для установки использовал образы докер docker:dind для работы динамических агентов и образ jenkins/jenkins:2.332.3-jdk11 с добавлением плагинов blueocean и docker-workflow. Докерфайл:
+```
+FROM jenkins/jenkins:2.332.3-jdk11
+USER root
+RUN apt-get update && \
+  apt-get install -y lsb-release && \
+  curl -fsSLo /usr/share/keyrings/docker-archive-keyring.asc \
+  https://download.docker.com/linux/debian/gpg
+
+RUN echo "deb [arch=$(dpkg --print-architecture) \
+  signed-by=/usr/share/keyrings/docker-archive-keyring.asc] \
+  https://download.docker.com/linux/debian \
+  $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list && \
+  apt-get update && \
+  apt-get install -y docker-ce-cli
+
+USER jenkins
+
+RUN jenkins-plugin-cli --plugins "blueocean:1.25.3 docker-workflow:1.28"
+```
 2) Запустить и проверить работоспособность.
 Выполнено. Jenkins запущен успешно, зашел под админом и паролем по умолчанию (нашел его в файле /var/lib/jenkins/secrets/initialAdminPassword).
 3) Сделать первоначальную настройку.
